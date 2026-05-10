@@ -447,6 +447,123 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 /* ══ GRAM BADGE ══ */
 .gram-pos{display:inline-block;background:#dbeafe;color:#1e3a8a;border:1px solid #bfdbfe;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700;font-family:monospace}
 .gram-neg{display:inline-block;background:#fce7f3;color:#831843;border:1px solid #fbcfe8;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700;font-family:monospace}
+
+/* ══ HAMBURGER BUTTON ══ */
+.hamburger{
+  display:none;
+  align-items:center;justify-content:center;
+  width:38px;height:38px;border-radius:9px;
+  background:transparent;border:1.5px solid var(--border);
+  cursor:pointer;flex-shrink:0;
+  transition:background .15s;
+}
+.hamburger:hover{background:var(--leaf-xpale)}
+.hamburger svg{color:var(--text);width:20px;height:20px}
+
+/* ══ SIDEBAR OVERLAY (mobile) ══ */
+.sidebar-overlay{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.35);
+  z-index:20;
+  backdrop-filter:blur(2px);
+}
+.sidebar-overlay.active{display:block}
+
+/* ══ MOBILE RESPONSIVE ══ */
+@media (max-width: 768px) {
+
+  /* Layout: stack sidebar on top as drawer */
+  .app{flex-direction:column;height:100vh;overflow:hidden}
+
+  /* Sidebar becomes a fixed off-canvas drawer */
+  .sidebar{
+    position:fixed;left:0;top:0;bottom:0;
+    width:280px;
+    transform:translateX(-100%);
+    transition:transform .25s cubic-bezier(.4,0,.2,1);
+    z-index:30;
+    box-shadow:4px 0 24px rgba(0,40,20,.15);
+  }
+  .sidebar.open{transform:translateX(0)}
+
+  /* Show hamburger */
+  .hamburger{display:flex}
+
+  /* Topbar adjustments */
+  .topbar{padding:0 14px;gap:10px}
+  .tb-sub{display:none}
+
+  /* Main fills viewport */
+  .main{flex:1;width:100%;overflow:hidden}
+
+  /* Content padding smaller on mobile */
+  .content{padding:16px 14px 60px}
+
+  /* Dashboard hero row → stacked */
+  .dashboard-hero-row{
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+
+  /* Hero card */
+  .hero{padding:24px 20px}
+  .hero-title{font-size:26px}
+  .hero-desc{font-size:13px}
+  .hero-btns{flex-direction:column}
+  .hero-btns .btn{width:100%;justify-content:center}
+
+  /* Stats strip → 2x2 grid */
+  .stats{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat-val{font-size:22px}
+
+  /* Module cards → 1 column */
+  .modules{grid-template-columns:1fr}
+
+  /* Two-col layouts → stacked */
+  .two-col{grid-template-columns:1fr}
+  .two-col-rev{grid-template-columns:1fr}
+
+  /* Plant grid → 1 column */
+  .plant-grid{grid-template-columns:1fr}
+
+  /* Form grid → stacked */
+  .form-grid-2{grid-template-columns:1fr}
+
+  /* Page title smaller */
+  .pg-title{font-size:22px}
+
+  /* Table: hide some columns, allow scroll */
+  .tbl-wrap{overflow-x:auto}
+  .tbl th:nth-child(3),
+  .tbl td:nth-child(3){display:none}
+
+  /* Bacteria table — hide family on small screens */
+  .tbl th:nth-child(5),
+  .tbl td:nth-child(5){display:none}
+
+  /* About card */
+  .about-card{padding:20px 16px}
+
+  /* Result box font */
+  .result-box .rval{font-size:36px}
+
+  /* Topbar title */
+  .tb-title{font-size:14px}
+
+  /* Sec header */
+  .sec-title{font-size:17px}
+
+  /* Card padding */
+  .card{padding:18px 16px}
+}
+
+@media (max-width: 400px) {
+  .hero-title{font-size:22px}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat-val{font-size:20px}
+  .content{padding:12px 10px 60px}
+}
 </style>
 </head>
 <body>
@@ -546,8 +663,14 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 
 <!-- ══════════ MAIN ══════════ -->
 <div class="main">
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
   <header class="topbar">
     <div class="topbar-l">
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
       <span class="tb-title">PlanteIA</span>
       <span class="tb-sub">Plateforme chercheur</span>
@@ -954,12 +1077,24 @@ const BACTERIA = [
   {id:"calbicans",name:"C. albicans",gram:"+",family:"Saccharomycetaceae (levure)",pathogenicity:"Modérée",sensitivity:"Modérée",habitat:"Muqueuses",note:"Levure incluse en référence antifongique."},
 ];
 
+function toggleSidebar() {
+  const sb = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sb.classList.toggle('open');
+  overlay.classList.toggle('active');
+}
+
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   document.getElementById('nav-'+name).classList.add('active');
   if(name === 'library') renderLibrary();
+  // Close sidebar on mobile after navigation
+  const sb = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sb.classList.remove('open');
+  overlay.classList.remove('active');
 }
 
 function updateSliderStyle(input) {
